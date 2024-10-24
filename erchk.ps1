@@ -23,8 +23,10 @@ $secondaryRt = Get-AzExpressRouteCircuitRouteTable -ExpressRouteCircuitName $Exp
 
 # Remove the routes originated by Azure VNets connected to the circuit
 # The routes originated by Azure VNets contain ASN 65515 in their AS Path
-$fromOnPremPrimary = $primaryRt | Where-Object { !($_.Path).Contains("65515") }
-$fromOnPremSecondary = $secondaryRt | Where-Object { !($_.Path).Contains("65515") }
+# Routes learned over Global Reach connections contain ASN 12076 in their AS Path 
+$fromOnPremPrimary = $primaryRt | Where-Object { ! (($_.Path).Contains("65515") -or ($_.Path).Contains("12076")) }
+$fromOnPremSecondary = $secondaryRt | Where-Object { ! (($_.Path).Contains("65515") -or ($_.Path).Contains("12076")) }
+
 
 # Iterate over the routes announced from the customer/partner edge in the primary BGP session
 # and extract those that are NOT announced in the secondary BGP session
